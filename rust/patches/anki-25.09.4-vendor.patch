@@ -1,0 +1,153 @@
+--- /tmp/anki-source/rslib/src/scheduler/mod.rs	2026-06-16 16:13:12.629332970 +0800
++++ /home/merlin/Workplace/github/Merlin-Xu-G/anki-harmony/rust/vendor/anki/rslib/src/scheduler/mod.rs	2026-06-17 00:25:02.711015205 +0800
+@@ -12,7 +12,7 @@
+ pub(crate) mod filtered;
+ pub mod fsrs;
+ pub mod new;
+-pub(crate) mod queue;
++pub mod queue; // PATCHED: made pub for anki-harmony bridge access
+ mod reviews;
+ mod service;
+ pub mod states;
+
+--- /tmp/anki-source/rslib/src/scheduler/states/mod.rs	2026-06-16 16:13:12.630290209 +0800
++++ /home/merlin/Workplace/github/Merlin-Xu-G/anki-harmony/rust/vendor/anki/rslib/src/scheduler/states/mod.rs	2026-06-17 00:42:34.181788803 +0800
+@@ -30,7 +30,7 @@
+ use crate::revlog::RevlogReviewKind;
+ use crate::scheduler::answering::PreviewDelays;
+ 
+-#[derive(Debug, Clone, Copy, PartialEq)]
++#[derive(Debug, Clone, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
+ pub enum CardState {
+     Normal(NormalState),
+     Filtered(FilteredState),
+@@ -153,7 +153,7 @@
+     }
+ }
+ 
+-#[derive(Debug, Clone)]
++#[derive(Debug, Clone, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
+ pub struct SchedulingStates {
+     pub current: CardState,
+     pub again: CardState,
+
+--- /tmp/anki-source/rslib/src/scheduler/states/filtered.rs	2026-06-16 16:13:12.630115101 +0800
++++ /home/merlin/Workplace/github/Merlin-Xu-G/anki-harmony/rust/vendor/anki/rslib/src/scheduler/states/filtered.rs	2026-06-17 00:42:34.186690479 +0800
+@@ -9,7 +9,7 @@
+ use super::StateContext;
+ use crate::revlog::RevlogReviewKind;
+ 
+-#[derive(Debug, Clone, Copy, PartialEq)]
++#[derive(Debug, Clone, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
+ pub enum FilteredState {
+     Preview(PreviewState),
+     Rescheduling(ReschedulingFilterState),
+
+--- /tmp/anki-source/rslib/src/scheduler/states/learning.rs	2026-06-16 16:13:12.630290209 +0800
++++ /home/merlin/Workplace/github/Merlin-Xu-G/anki-harmony/rust/vendor/anki/rslib/src/scheduler/states/learning.rs	2026-06-17 00:42:34.191547033 +0800
+@@ -9,7 +9,7 @@
+ use crate::card::FsrsMemoryState;
+ use crate::revlog::RevlogReviewKind;
+ 
+-#[derive(Debug, Clone, Copy, PartialEq)]
++#[derive(Debug, Clone, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
+ pub struct LearnState {
+     pub remaining_steps: u32,
+     pub scheduled_secs: u32,
+
+--- /tmp/anki-source/rslib/src/scheduler/states/new.rs	2026-06-16 16:13:12.630290209 +0800
++++ /home/merlin/Workplace/github/Merlin-Xu-G/anki-harmony/rust/vendor/anki/rslib/src/scheduler/states/new.rs	2026-06-17 00:42:34.196376384 +0800
+@@ -4,7 +4,7 @@
+ use super::interval_kind::IntervalKind;
+ use crate::revlog::RevlogReviewKind;
+ 
+-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
++#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, serde::Serialize, serde::Deserialize)]
+ pub struct NewState {
+     pub position: u32,
+ }
+
+--- /tmp/anki-source/rslib/src/scheduler/states/normal.rs	2026-06-16 16:13:12.630290209 +0800
++++ /home/merlin/Workplace/github/Merlin-Xu-G/anki-harmony/rust/vendor/anki/rslib/src/scheduler/states/normal.rs	2026-06-17 00:42:34.201263905 +0800
+@@ -10,7 +10,7 @@
+ use super::StateContext;
+ use crate::revlog::RevlogReviewKind;
+ 
+-#[derive(Debug, Clone, Copy, PartialEq)]
++#[derive(Debug, Clone, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
+ pub enum NormalState {
+     New(NewState),
+     Learning(LearnState),
+
+--- /tmp/anki-source/rslib/src/scheduler/states/preview_filter.rs	2026-06-16 16:13:12.630290209 +0800
++++ /home/merlin/Workplace/github/Merlin-Xu-G/anki-harmony/rust/vendor/anki/rslib/src/scheduler/states/preview_filter.rs	2026-06-17 00:42:34.206035127 +0800
+@@ -7,7 +7,7 @@
+ use super::StateContext;
+ use crate::revlog::RevlogReviewKind;
+ 
+-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
++#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+ pub struct PreviewState {
+     pub scheduled_secs: u32,
+     pub finished: bool,
+
+--- /tmp/anki-source/rslib/src/scheduler/states/relearning.rs	2026-06-16 16:13:12.630290209 +0800
++++ /home/merlin/Workplace/github/Merlin-Xu-G/anki-harmony/rust/vendor/anki/rslib/src/scheduler/states/relearning.rs	2026-06-17 00:42:34.210825737 +0800
+@@ -9,7 +9,7 @@
+ use super::StateContext;
+ use crate::revlog::RevlogReviewKind;
+ 
+-#[derive(Debug, Clone, Copy, PartialEq)]
++#[derive(Debug, Clone, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
+ pub struct RelearnState {
+     pub learning: LearnState,
+     pub review: ReviewState,
+
+--- /tmp/anki-source/rslib/src/scheduler/states/rescheduling_filter.rs	2026-06-16 16:13:12.630290209 +0800
++++ /home/merlin/Workplace/github/Merlin-Xu-G/anki-harmony/rust/vendor/anki/rslib/src/scheduler/states/rescheduling_filter.rs	2026-06-17 00:42:34.215713551 +0800
+@@ -8,7 +8,7 @@
+ use super::StateContext;
+ use crate::revlog::RevlogReviewKind;
+ 
+-#[derive(Debug, Clone, Copy, PartialEq)]
++#[derive(Debug, Clone, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
+ pub struct ReschedulingFilterState {
+     pub original_state: NormalState,
+ }
+
+--- /tmp/anki-source/rslib/src/scheduler/states/review.rs	2026-06-16 16:13:12.630290209 +0800
++++ /home/merlin/Workplace/github/Merlin-Xu-G/anki-harmony/rust/vendor/anki/rslib/src/scheduler/states/review.rs	2026-06-17 00:42:34.220530003 +0800
+@@ -18,7 +18,7 @@
+ pub const EASE_FACTOR_HARD_DELTA: f32 = -0.15;
+ pub const EASE_FACTOR_EASY_DELTA: f32 = 0.15;
+ 
+-#[derive(Debug, Clone, Copy, PartialEq)]
++#[derive(Debug, Clone, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
+ pub struct ReviewState {
+     pub scheduled_days: u32,
+     pub elapsed_days: u32,
+
+--- /tmp/anki-source/rslib/src/notetype/mod.rs	2026-06-16 16:13:12.628205056 +0800
++++ /home/merlin/Workplace/github/Merlin-Xu-G/anki-harmony/rust/vendor/anki/rslib/src/notetype/mod.rs	2026-06-17 00:25:15.366527955 +0800
+@@ -7,7 +7,7 @@
+ mod fields;
+ mod merge;
+ mod notetypechange;
+-mod render;
++pub mod render; // PATCHED: made pub for anki-harmony bridge access
+ mod restore;
+ pub(crate) mod schema11;
+ mod schemachange;
+
+--- /tmp/anki-source/rslib/src/card/mod.rs	2026-06-16 16:13:12.624340664 +0800
++++ /home/merlin/Workplace/github/Merlin-Xu-G/anki-harmony/rust/vendor/anki/rslib/src/card/mod.rs	2026-06-17 00:33:15.809993565 +0800
+@@ -100,7 +100,7 @@
+     pub(crate) custom_data: String,
+ }
+ 
+-#[derive(Debug, Clone, Copy, PartialEq)]
++#[derive(Debug, Clone, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
+ pub struct FsrsMemoryState {
+     /// The expected memory stability, in days.
+     pub stability: f32,
+
