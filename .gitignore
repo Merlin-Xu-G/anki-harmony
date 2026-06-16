@@ -1,0 +1,19 @@
+# Build artifacts
+.hvigor/
+oh_modules/
+build/
+output/
+node_modules/
+
+# IDE
+.idea/
+*.iml
+local.properties
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Credentials
+*.key
+*.p12
