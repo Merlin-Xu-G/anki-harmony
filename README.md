@@ -48,4 +48,5 @@ See [Contributing Guide](CONTRIBUTING.md) (TODO).
 
 ## License
 
-MIT
+AGPL-3.0 (consistent with Anki's license — we use NAPI to link against
+portableanki, so copyleft applies).
