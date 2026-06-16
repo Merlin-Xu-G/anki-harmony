@@ -52,6 +52,19 @@ export interface AnswerResult {
   cardId: number;
 }
 
+/** Result of importing an .apkg file. */
+export interface ImportResult {
+  foundNotes: number;
+  newCount: number;
+  updatedCount: number;
+  duplicateCount: number;
+}
+
+/** Result of exporting an .apkg file. */
+export interface ExportResult {
+  noteCount: number;
+}
+
 // --- Error Handling ---
 
 export enum AnkiErrorCode {
@@ -100,6 +113,23 @@ export interface IAnkiBridge {
    */
   answerCard(cardId: number, rating: number, millisTaken: number, statesJson: string): Promise<AnswerResult>;
   getQueueCounts(): Promise<QueueCounts>;
+
+  // --- Import/Export ---
+  /**
+   * Import an .apkg file into the collection.
+   * @param apkgPath  Path to the .apkg file.
+   * @param mergeNotetypes  If true, merge notetypes instead of adding new ones.
+   * @param withScheduling  If true, preserve scheduling info from the package.
+   */
+  importApkg(apkgPath: string, mergeNotetypes: boolean, withScheduling: boolean): Promise<ImportResult>;
+  /**
+   * Export a deck (or whole collection) as .apkg.
+   * @param outPath  Where to write the .apkg file.
+   * @param withScheduling  Include scheduling data.
+   * @param withMedia  Include media files.
+   * @param search  Search filter (empty = whole collection).
+   */
+  exportApkg(outPath: string, withScheduling: boolean, withMedia: boolean, search: string): Promise<ExportResult>;
 
   // --- Version ---
   getBridgeVersion(): string;

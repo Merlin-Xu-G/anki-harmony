@@ -6,6 +6,7 @@ extern crate napi_derive;
 
 use anki_harmony_wrapper::collection::{self, DeckInfo};
 use anki_harmony_wrapper::error::AnkiHarmonyError;
+use anki_harmony_wrapper::import_export as io_mod;
 use anki_harmony_wrapper::review::{
     self as review_mod, AnswerResult, NextCardInfo, QueueCounts, Rating,
 };
@@ -166,6 +167,66 @@ pub fn answer_card(
 pub fn get_queue_counts() -> napi::Result<JsQueueCounts> {
     review_mod::get_queue_counts()
         .map(JsQueueCounts::from)
+        .map_err(to_napi_error)
+}
+
+// --- Import/Export Operations ---
+
+#[napi(object)]
+pub struct JsImportResult {
+    pub found_notes: u32,
+    pub new_count: u32,
+    pub updated_count: u32,
+    pub duplicate_count: u32,
+}
+
+impl From<io_mod::ImportResult> for JsImportResult {
+    fn from(r: io_mod::ImportResult) -> Self {
+        Self {
+            found_notes: r.found_notes,
+            new_count: r.new_count,
+            updated_count: r.updated_count,
+            duplicate_count: r.duplicate_count,
+        }
+    }
+}
+
+#[napi(object)]
+pub struct JsExportResult {
+    pub note_count: u32,
+}
+
+impl From<io_mod::ExportResult> for JsExportResult {
+    fn from(r: io_mod::ExportResult) -> Self {
+        Self {
+            note_count: r.note_count as u32,
+        }
+    }
+}
+
+#[napi]
+/// Import an .apkg file into the currently open collection.
+pub fn import_apkg(
+    apkg_path: String,
+    merge_notetypes: bool,
+    with_scheduling: bool,
+) -> napi::Result<JsImportResult> {
+    io_mod::import_apkg(&apkg_path, merge_notetypes, with_scheduling)
+        .map(JsImportResult::from)
+        .map_err(to_napi_error)
+}
+
+#[napi]
+/// Export a deck (or the whole collection) as an .apkg file.
+/// search: empty string = whole collection.
+pub fn export_apkg(
+    out_path: String,
+    with_scheduling: bool,
+    with_media: bool,
+    search: String,
+) -> napi::Result<JsExportResult> {
+    io_mod::export_apkg(&out_path, with_scheduling, with_media, &search)
+        .map(JsExportResult::from)
         .map_err(to_napi_error)
 }
 

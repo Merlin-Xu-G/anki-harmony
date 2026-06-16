@@ -9,6 +9,7 @@
 
 pub mod collection;
 pub mod error;
+pub mod import_export;
 pub mod review;
 
 use anyhow::Result;

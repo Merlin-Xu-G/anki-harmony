@@ -1,15 +1,18 @@
 // ArkTS data models for AnkiHarmony
-// These mirror the Rust types in wrapper/ and are exposed via NAPI bridge.
+// These mirror the Rust types exposed via NAPI bridge.
+// Bridge types (for NAPI interop) are in common/BridgeContract.ets.
+// These are higher-level domain models used by the UI layer.
 
-/** A deck containing cards. */
+/** Deck information — matches NAPI JsDeckInfo shape. */
 export interface DeckInfo {
   id: number;
   name: string;
-  description: string;
-  cardCount: number;
-  newCount: number;
-  learningCount: number;
+  level: number;
+  collapsed: boolean;
   reviewCount: number;
+  learnCount: number;
+  newCount: number;
+  children: DeckInfo[];
 }
 
 /** A note (the content behind flashcards). */
@@ -43,20 +46,11 @@ export enum Rating {
   Easy = 4,
 }
 
-/** The next card to review. */
-export interface NextCard {
-  card: CardInfo;
-  note: NoteInfo;
-  question: string;
-  answer: string;
-  counts: QueueCounts;
-}
-
-/** Counts of cards in each queue. */
+/** Counts of cards in each queue — matches NAPI JsQueueCounts shape. */
 export interface QueueCounts {
-  new: number;
-  learning: number;
-  review: number;
+  newCount: number;
+  learningCount: number;
+  reviewCount: number;
 }
 
 /** Sync status. */
