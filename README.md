@@ -48,4 +48,4 @@ See [Contributing Guide](CONTRIBUTING.md) (TODO).
 
 ## License
 
-AGPL-3.0 (consistent with Anki's license).
+MIT
